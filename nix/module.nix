@@ -49,6 +49,24 @@ let
     StateDirectory = "yamtrack";
     Restart = "on-failure";
   };
+
+  # Module-level management wrapper (like Nextcloud's nextcloud-occ).
+  # Auto-sudos when not already the service user and pre-sets all env vars.
+  envExports = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (k: v: "export ${k}=${lib.escapeShellArg v}") env
+  );
+  manageCli = (pkgs.writeShellScriptBin "yamtrack-manage" (
+    ''
+      if [ "$(id -un)" != ${lib.escapeShellArg cfg.user} ]; then
+        exec sudo -u ${lib.escapeShellArg cfg.user} "$0" "$@"
+      fi
+    ''
+    + envExports
+    + ''
+
+      exec ${pkg}/bin/yamtrack-manage "$@"
+    ''
+  )).overrideAttrs { meta.priority = 4; };
 in
 {
   options.services.yamtrack = {
@@ -145,6 +163,8 @@ in
         message = "services.yamtrack.hostName must be set when services.yamtrack.configureNginx is enabled.";
       }
     ];
+
+    environment.systemPackages = [ manageCli ];
 
     services.yamtrack.trustedOrigins = lib.mkIf (cfg.hostName != "") (
       if cfg.configureNginx then

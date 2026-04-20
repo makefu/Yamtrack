@@ -152,6 +152,26 @@ nix build .#checks.x86_64-linux.yamtrack-playwright
 nix run .#run-tests
 ```
 
+### Migrating from SQLite to PostgreSQL
+
+If you started with the default SQLite backend and want to switch to PostgreSQL,
+use the built-in migration command to transfer all data (users, media, lists,
+events) while preserving passwords and timestamps.
+
+**Prerequisites:** A working PostgreSQL database that Yamtrack can connect to
+(run `yamtrack-manage migrate` against it first so the schema exists).
+
+```bash
+# Generic (Docker, manual installs)
+yamtrack-manage migrate_from_sqlite --sqlite-path /path/to/old/db.sqlite3
+
+# NixOS — the module-provided wrapper handles sudo and env vars automatically
+yamtrack-manage migrate_from_sqlite --sqlite-path /var/lib/yamtrack/db/db.sqlite3
+```
+
+The command is **idempotent**: re-running it skips rows that were already
+migrated, so it is safe to retry after a partial failure.
+
 ## 💻 Local development
 
 Clone the repository and change directory to it.

@@ -8,6 +8,7 @@
 #   checks.x86_64-linux.yamtrack-sqlite       — NixOS VM test with SQLite
 #   checks.x86_64-linux.yamtrack-postgresql   — NixOS VM test with PostgreSQL
 #   checks.x86_64-linux.yamtrack-nginx        — NixOS VM test with nginx reverse proxy
+#   checks.x86_64-linux.yamtrack-migration   — NixOS VM test for SQLite→PostgreSQL migration
 #   checks.x86_64-linux.yamtrack-playwright   — Playwright integration tests in VM
 #   nixosModules.default              — NixOS service module
 #
@@ -65,6 +66,8 @@
           yamtrack-sqlite
           yamtrack-postgresql
           yamtrack-nginx
+          yamtrack-migration
+          yamtrack-migration-production
           yamtrack-playwright
           ;
       };
